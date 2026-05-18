@@ -62,7 +62,7 @@ In all three functions, the core biplot construction is handled by \CRANpkg{bipl
 In the fixed variable frame, a single PCA solution is performed on the full dataset \({\bf{X}}\), yielding one set of sample scores, \({\bf{Z}}\), represented by plotted coordinates, and one set of variable loadings, \({\bf{V}}\), as vectors. The variable vectors remain constant throughout the animation, providing a stable reference frame for interpretation. The sample scores are then sliced according to the levels of the time variable and animated sequentially, highlighting how observations move relative to a fixed coordinate system defined by the overall variance structure of the data. This framework is illustrated in Figure \ref{fig:fixed-frame}.
 
 \begin{figure}[!]
-\includegraphics[width=1\linewidth]{figures/Fixed_variable_frame} \caption{The fixed variable framework where the sample scores in matrix ${\bf{Z}}$ are sliced according to the levels of the time variable $T$ and the variable vectors in matrix ${\bf{V}}$ remaining fixed.}\label{fig:fixed-frame}
+\includegraphics[width=1\linewidth]{figures/Fixed_variable_frame} \caption{The fixed variable framework where the sample coordinates in matrix ${\bf{Z}}$ are sliced according to the levels of the time variable $T$ and the variable vectors in matrix ${\bf{V}}$ remaining fixed.}\label{fig:fixed-frame}
 \end{figure}
 
 This approach is most appropriate when the underlying variance--covariance structure can be assumed stable across time, and is the only viable option when there is a single observation per group per time level, since a per-slice PCA solution would not be feasible in that setting.
@@ -80,8 +80,7 @@ avg_year_continent <- gapminder |>
   group_by(year, continent) |>
   summarise(
     across(c(lifeExp, pop, gdpPercap), \(x) round(mean(x, na.rm = TRUE), 2)),
-    .groups = "drop"
-           )
+    .groups = "drop")
 \end{verbatim}
 
 A PCA biplot is first constructed using \CRANpkg{biplotEZ}, with continent as the grouping aesthetic and year as the sample label. Because the three continuous variables are on vastly different scales, standardization is applied:
@@ -189,7 +188,7 @@ Note that when fewer than three observations exist for a particular group and ti
 \includegraphics[width=1\linewidth]{figures/Dynamic_frame} \caption{The dynamic variable framework where separate matrices ${\bf{Z}}$ and ${\bf{V}}$ are computed for each level of the time variable $T$.}\label{fig:dyn-frame}
 \end{figure}
 
-Because \texttt{moveplot2()} fits a separate PCA per time slice, it requires a sufficient number of observations within each slice to perform the decomposition. It is therefore not suitable for datasets with a single observation per group per time level, such as the aggregated \emph{gapminder} data used in Section \ref{gapminderdata}. The \texttt{Africa\_climate} dataset, which contains multiple observations per region and time level, is used to demonstrate this function throughout this section.
+Because \texttt{moveplot2()} fits a separate PCA per time slice, it requires a sufficient number of observations within each slice to perform the decomposition. It is therefore not suitable for datasets with a single observation per group per time level, such as the aggregated \emph{gapminder} data used in the previous section. The \texttt{Africa\_climate} dataset, which contains multiple observations per region and time level, is used to demonstrate this function throughout this section.
 
 \begin{verbatim}
 bp |> moveplot2(time.var = "Year", group.var = "Region", 
@@ -393,7 +392,7 @@ We are grateful for the insights and contributions of Dianne Cook during the ini
 
 \address{%
 Raeesa Ganey\\
-University of Witwatersrand\\%
+University of Witwatersrand and Centre for Multi-Dimensional Data Visualisation (MuViSU)\\%
 Johannesburg, South Africa\\
 %
 %
@@ -403,7 +402,7 @@ Johannesburg, South Africa\\
 
 \address{%
 Johané Nienkemper-Swanepoel\\
-Stellenbosch University\\%
+Stellenbosch University and Centre for Multi-Dimensional Data Visualisation (MuViSU)\\%
 Stellenbosch, South Africa\\
 %
 %

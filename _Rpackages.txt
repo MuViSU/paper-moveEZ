@@ -1,0 +1,6 @@
+moveEZ
+ggplot2
+dplyr
+biplotEZ
+kableExtra
+gapminder

@@ -81,7 +81,7 @@ if (knitr::is_latex_output()) {
 
 
 
-## ----fixed-frame, echo = FALSE, fig.width = 6, fig.height = 4, fig.cap="The fixed variable framework where the sample scores in matrix ${\\bf{Z}}$ are sliced according to the levels of the time variable $T$ and the variable vectors in matrix ${\\bf{V}}$ remaining fixed."----
+## ----fixed-frame, echo = FALSE, fig.width = 6, fig.height = 4, fig.cap="The fixed variable framework where the sample coordinates in matrix ${\\bf{Z}}$ are sliced according to the levels of the time variable $T$ and the variable vectors in matrix ${\\bf{V}}$ remaining fixed."----
   knitr::include_graphics("figures/Fixed_variable_frame.png")
 
 
@@ -94,8 +94,7 @@ avg_year_continent <- gapminder |>
   group_by(year, continent) |>
   summarise(
     across(c(lifeExp, pop, gdpPercap), \(x) round(mean(x, na.rm = TRUE), 2)),
-    .groups = "drop"
-           )
+    .groups = "drop")
 
 
 ## ----bp-gap-setup, eval=FALSE, echo=TRUE--------------------------------------
@@ -117,8 +116,7 @@ knitr::include_graphics("figures/biplot_gapminder.png")
 #     hulls = FALSE,
 #     shadow = TRUE,
 #     scale.var = 3,
-#     move = TRUE
-#   )
+#     move = TRUE)
 # 
 
 
