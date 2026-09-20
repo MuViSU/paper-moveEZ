@@ -339,16 +339,23 @@ results <- bp |>
 #   moveplot3(time.var = "Year", group.var = "Region", hulls = TRUE,
 #             move = FALSE, target = NULL) |>
 #   evaluation()
-# results$eval.list
+# results$eval.tab
 
 
 ## ----comp-tab, echo = FALSE---------------------------------------------------
+# eval.tab is a pre-formatted kable, so the measures are taken from the plot data
+eval_df <- rbind(results$fit.plot$layers[[1]]$data,
+                 results$bias.plot$layers[[1]]$data)
+eval_mat <- with(eval_df, tapply(Value, list(Year, Measure), mean))
+eval_mat <- round(eval_mat[, c("PS", "CC", "AMB", "MB", "RMSB")], 3)
+rownames(eval_mat) <- paste("Target vs.", rownames(eval_mat))
+
 if (knitr::is_html_output()) {
-  knitr::kable(results$eval.list[1:2], 
+  knitr::kable(eval_mat[1:2, ],
                caption = "Measures of comparison.",
                booktabs = TRUE, escape = FALSE, format = "html")
 } else {
-  knitr::kable(results$eval.list[1:2], 
+  knitr::kable(eval_mat[1:2, ],
                caption = "Measures of comparison.",
                booktabs = TRUE, escape = FALSE, format = "latex")
 }

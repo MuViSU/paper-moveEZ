@@ -328,7 +328,7 @@ bp <- biplot(Africa_climate, scaled = TRUE) |>
 knitr::include_graphics("figures/biplot_Africa_climate.png")
 ```
 
-From the biplot in Figure \@ref(fig:biplot-Afr), the relationships between the variables are exposed, but there is some difficulty to separate the regions without intervention. Importantly, information on the time differences are not available which means a sequential exploration is impossible. These aspects are are addressed in \CRANpkg{moveEZ}. 
+From the biplot in Figure \@ref(fig:biplot-Afr), the relationships between the variables are exposed, but there is some difficulty to separate the regions without intervention. Importantly, information on the time differences are not available which means a sequential exploration is impossible. These aspects are addressed in \CRANpkg{moveEZ}. 
 
 Setting `move = FALSE` produces a faceted display, shown in Figure \@ref(fig:moveplot-plot), where convex hulls summarize each region at each time point:
 
@@ -513,7 +513,7 @@ results <- bp |>
   moveplot3(time.var = "Year", group.var = "Region", hulls = TRUE, 
             move = FALSE, target = NULL) |> 
   evaluation()
-results$eval.list
+results$eval.tab
 ```
 
 
@@ -521,12 +521,19 @@ Table \@ref(tab:comp-tab) shows the measures for the first two comparisons, the 
 
 
 ```{r comp-tab, echo = FALSE}
+# eval.tab is a pre-formatted kable, so the measures are taken from the plot data
+eval_df <- rbind(results$fit.plot$layers[[1]]$data,
+                 results$bias.plot$layers[[1]]$data)
+eval_mat <- with(eval_df, tapply(Value, list(Year, Measure), mean))
+eval_mat <- round(eval_mat[, c("PS", "CC", "AMB", "MB", "RMSB")], 3)
+rownames(eval_mat) <- paste("Target vs.", rownames(eval_mat))
+
 if (knitr::is_html_output()) {
-  knitr::kable(results$eval.list[1:2], 
+  knitr::kable(eval_mat[1:2, ],
                caption = "Measures of comparison.",
                booktabs = TRUE, escape = FALSE, format = "html")
 } else {
-  knitr::kable(results$eval.list[1:2], 
+  knitr::kable(eval_mat[1:2, ],
                caption = "Measures of comparison.",
                booktabs = TRUE, escape = FALSE, format = "latex")
 }
@@ -569,5 +576,3 @@ Future development of \CRANpkg{moveEZ} will focus on extending animation support
 # Acknowledgements
 
 We are grateful for the insights and contributions of Dianne Cook during the initial design phase of this package. Thank you for the financial support from the National Graduate Academy for Mathematical and Statistical Sciences (NGA(MaSS)).
-
-# References

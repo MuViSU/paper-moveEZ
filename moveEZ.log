@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  18 MAY 2026 13:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.9.20)  20 SEP 2026 20:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **moveEZ.tex
 (./moveEZ.tex
-LaTeX2e <2025-11-01>
-L3 programming layer <2026-04-28>
+LaTeX2e <2026-06-01>
+L3 programming layer <2026-08-10>
 ! Undefined control sequence.
 l.7 \maketitle
               
@@ -17,10 +17,10 @@ and I'll forget about whatever was undefined.
 
  
 Here is how much of TeX's memory you used:
- 14 strings out of 469331
- 340 string characters out of 5464964
- 435241 words of memory out of 5000000
- 28951 multiletter control sequences out of 15000+600000
+ 14 strings out of 469089
+ 340 string characters out of 5457832
+ 435796 words of memory out of 5000000
+ 29190 multiletter control sequences out of 15000+600000
  627721 words of font info for 40 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  12i,0n,13p,70b,8s stack positions out of 10000i,1000n,20000p,200000b,200000s

@@ -1,0 +1,111 @@
+
+## Referee report of "moveEZ: An R Package for Animated Biplots".
+
+* **Id**: 2026-64
+
+## General
+
+The `moveEZ` package addresses a potentially useful problem: animating PCA biplots across the levels of an ordered categorical variable. The `moveplot()` function, which projects observations from different time slices into a common global PCA space, is conceptually sound and represents a reasonable contribution to the R community. In particular, the use of a fixed variable frame provides an intuitive way to examine trajectories in multivariate data while maintaining a stable coordinate system.
+
+However, the manuscript has substantial weaknesses in methodological justification, validation, literature engagement, and presentation. In particular, the statistical motivation and interpretation of the dynamic variable frame implemented by `moveplot2()` and `moveplot3()` are not sufficiently established. The manuscript currently treats the alignment of separately computed PCA solutions primarily as a technical visualization problem, whereas it raises more fundamental questions about whether the resulting components and variable vectors are statistically comparable across time. The manuscript also does not adequately position `moveEZ` relative to the existing ecosystem of animated high-dimensional visualization in R, particularly tour methods.
+
+Overall, I think the underlying idea is potentially useful, and the fixed-frame approach is sensible. However, substantial revision is required before the manuscript can be considered for publication.
+
+### 1. The motivation for the dynamic two-dimensional frame needs to be clarified
+
+The fixed-frame approach in `moveplot()` is relatively straightforward to interpret because observations are projected into a common PCA space. The motivation for changing the variable frame in `moveplot2()` and `moveplot3()` is less clear.
+
+The authors should identify the specific analytical questions for which a separate PCA at each time point is necessary or substantially more informative than a fixed global PCA or a sequence of static PCA plots. In particular, they should explain:
+
+1. What substantive question requires a separate PCA at each time point?
+2. What information is gained that cannot be obtained from `moveplot()` or static PCA plots?
+3. When should users prefer a fixed frame over a dynamic frame?
+4. How should users assess whether PC1 and PC2 adequately represent the relevant temporal structure?
+
+The restriction to the first two PCs also needs justification. Important temporal variation may occur in higher-order components and therefore be missed by a two-dimensional representation. This is particularly relevant when comparing `moveEZ` with tour methods, which can explore projections involving all dimensions. The authors should discuss this limitation and provide practical guidance on when a PC1–PC2 representation is appropriate.
+
+The authors should also clarify the relationship between the dynamic frame and the underlying analytical objective. If the primary purpose is to examine how variable directions change over time, this should be stated explicitly, together with guidance on when such changes are substantively meaningful rather than simply a consequence of refitting PCA.
+
+### 2. The statistical justification and interpretation of the dynamic variable frame need strengthening
+
+The main concern is the statistical interpretation of `moveplot2()` and `moveplot3()`. The manuscript argues that these functions are useful when directional relationships among variables evolve over time. However, if the variance-covariance structure changes across time slices, separately computed PCA solutions may represent different directions in variable space at different time points. This raises an important issue beyond simply aligning the plots.
+
+The authors should clarify what it means statistically to align PC1 and PC2 when these components may represent substantially different directions at different time points. Similarly, when a variable vector rotates, does this reflect a change in variable importance, relationships among variables, or instability in the separately estimated PCA solution? These possibilities should be distinguished rather than treating rotation as inherently meaningful temporal evolution.
+
+The interpretation of point positions and spread across frames also requires clarification. Because PCA is refitted for each subset, each biplot is initially defined in a different coordinate system. Although the alignment procedure attempts to make these configurations visually comparable, it does not necessarily make the PC axes statistically equivalent. Consequently, changes in the positions or spread of points and hulls may reflect changes in the PCA solution or total variance rather than changes in the observations themselves.
+
+This differs from a typical tour, where the data remain fixed and the projection basis changes while preserving the underlying data geometry. In the proposed approach, PCA is refitted at each time slice and GPA may additionally allow scaling. If total variance differs across time slices, this scaling may obscure genuine changes in the magnitude of variation. The authors should clarify this distinction and discuss its implications for interpretation.
+
+The use of Generalized Procrustes Analysis (GPA) also requires clarification. In particular, the authors should state whether scaling is enabled in `moveplot3()`. If scaling is applied, it may alter the relative magnitudes of the components and hence the representation of the variance structure. If scaling is disabled, the authors should explain why the remaining transformations are appropriate.
+
+More fundamentally, minimizing distances between configurations does not establish that the resulting PCA solutions are statistically comparable. Simulation studies with a known time-varying covariance structure would substantially strengthen the manuscript by assessing whether the proposed alignment recovers known changes or can itself introduce apparent rotations.
+
+The description of the alignment criterion, that the "squared sum of squares distances between a set target biplot and the aligned biplots are minimized", is also insufficiently clear. The authors should define what constitutes a distance between biplots and how these distances are computed, rather than relying solely on the cited reference.
+
+I can see value in using this approach to examine how variable directions change over time, similar in spirit to a tour. However, interpreting changes in the positions or spread of points and hulls is more difficult when both the PCA directions and total variance vary across time. This limitation should be explicitly acknowledged.
+
+Finally, the manuscript should provide clearer guidance on interpreting movement in the biplots. For `moveplot()`, this involves explaining movement within a fixed PCA space relative to the variable vectors; for `moveplot2()` and `moveplot3()`, the additional ambiguity caused by the changing coordinate system should be explicitly discussed.
+
+### 3. The contribution relative to existing methods should be clarified
+
+The manuscript needs a stronger discussion of existing approaches to animated high-dimensional visualization, particularly within the R ecosystem. The authors should position `moveEZ` relative to established packages such as `tourr`, `spinifex`, `langevitour`, and `detourr`, explaining what analytical questions `moveEZ` addresses that these approaches do not.
+
+In particular, the authors should clarify how the repeated PCA/GPA procedure differs conceptually from tour methods. In a typical tour, the data remain fixed while the projection basis changes continuously, whereas the proposed approach refits the PCA solution at each time point and may additionally rescale the configurations. The implications of this difference for statistical interpretation should be made explicit.
+
+The manuscript should also clarify whether animating biplots across an ordered variable is novel, or more specifically, how the implementation and statistical methodology differ from previous approaches. This would help establish the methodological contribution beyond the provision of a new R package.
+
+Finally, claims about the benefits of animation for perceiving multivariate movement should be supported by relevant literature on animated statistical graphics and visual perception, including discussion of their limitations.
+
+### 4. The case study should demonstrate analytical value rather than only functionality
+
+The Africa climate example is potentially useful, but it currently demonstrates functionality more than substantive analytical value. The authors should state the specific analytical question being addressed and explain what is learned from the animation that would be difficult to identify from static PCA plots, a fixed-frame `moveplot()`, or existing visualization methods.
+
+A stronger case study should demonstrate a concrete temporal pattern or substantive insight revealed by the dynamic biplot. For example, the authors could identify a change in the relationships among variables over time and show how this change is revealed by the dynamic variable frame.
+
+The case study should also make clear whether the observed movement reflects changes in the underlying data, changes in the PCA basis, changes in total variance, or some combination of these. This would provide a more convincing demonstration of the analytical value of the proposed approach rather than simply showing that the functions can produce an animation.
+
+### 5. Other comments
+
+**Section 3**
+
+* The statement that “Linear easing produces transitions at a constant rate, ensuring smooth and visually interpretable movement between states” may be too strong. Constant-rate interpolation produces smooth visual transitions, but smoothness does not necessarily imply statistical interpretability. The authors should qualify this statement.
+
+* The function names `moveplot()`, `moveplot2()`, and `moveplot3()` are not particularly informative about the methodological differences between the functions. More descriptive names would make the package easier to understand and use.
+
+**Section 4**
+
+* The statement that population provides “less discriminatory information in the PCA space due to its large variance” requires clarification. Since PCA is performed with `scaled = TRUE`, the variables are standardized before PCA, so the larger original variance of population should not explain its contribution. Moreover, the population vector appears relatively long and strongly aligned with one of the principal components, along which Asia shows substantial movement. Please clarify how the authors infer that population contributes less discriminatory information from the vector orientations.
+
+* There is a grammatical error: “are are” should be corrected to “are.”
+
+* When `move = FALSE`, convex hulls are used to summarize each region at each time point. Convex hulls can be strongly influenced by outliers and may therefore give a misleading representation of the central structure. Have the authors considered 90% or 95% multivariate normal ellipses, as commonly used in PCA visualizations to represent the central regions of groups?
+
+**Section 7**
+
+* The manuscript reports both the Procrustes Statistic (PS) and Congruence Coefficient (CC), with values close to zero indicating high similarity for PS and values close to one indicating high similarity for CC. How do these two measures differ, and what additional information is gained by reporting both?
+
+* For Figure 9, why not transform the Congruence Coefficient to `1 - CC` so that both measures have the same interpretation—where values closer to zero indicate greater similarity? This would also allow the plot to focus on the relatively small range of values shown for CC and make differences easier to see.
+
+**Section 10**
+
+* The manuscript contains both “Reference” and “Bibliography” headings. Only one is necessary.
+
+## Code
+
+### 1. Usability
+
+The package does not provide a sufficiently clear workflow for choosing between `moveplot()`, `moveplot2()`, and `moveplot3()`. Their different purposes and statistical mechanisms should be explained more explicitly. There are also implementation inconsistencies, duplicated/dead code, fragile input handling, inconsistent treatment of sparse data, and inconsistent output structures that could confuse users or cause downstream problems.
+
+The documentation is generally user-oriented and provides useful examples, but it contains several inconsistencies and copy–paste errors that reduce confidence in the package. In particular, some examples and parameter descriptions do not match the implementation, while `evaluation()` makes assumptions about the time variable and appears inconsistent with its stated interpretation. A careful documentation and API consistency check is needed before submission.
+
+### 2. Code
+
+1. GPA scaling is used without being discussed or reported. `moveplot3()` pulls `s.list` out of the GPA output (`plot.R:759`) and then discards it. Whether configurations are isotropically scaled before alignment is a substantive decision: if scaling is allowed, differences in total variance between slices (spread changes, which are real signal in climate data) are normalized away before the viewer sees them. Whether that happened depends on `GPAbin::GPA` defaults, which the package neither controls explicitly nor documents.
+2. `evaluation()` is internally inconsistent about what it compares. The function recomputes a Procrustes fit (`C.mat`, `A.mat`, `s.fact`, `b.fact`, `X.new` — `evaluation_func.R:71-77`) but then only PS is evaluated on the aligned quantities. CC, RMSB, MB, AMB are computed on the raw, pre-alignment testee vs. target (`evaluation_func.R:83-86`). Since the whole point of `moveplot3` is that pre-alignment frames differ by arbitrary rotations/reflections, these bias measures will be dominated by alignment ambiguity rather than genuine discrepancy, and the fitted `X.new` (with its translation term) is never actually used. Either the measures are on the wrong basis, or the Procrustes block is dead code. Also note PS's residual uses `s.fact*testee%*%A.mat` without `b.fact`, inconsistent with the `X.new` definition on the same page.
+3. Hard-coded "Year". `evaluation()` extracts the time label with `gsub("Target vs. ", ...)` and builds a `Year` column (`evaluation_func.R:100-106`). With any other time variable name the axis label is wrong, and non-numeric levels silently become NA. The package advertises an arbitrary ordered index; this is a latent bug.
+4. Row-correspondence in GPA targets is assumed, not checked. With an external target, rows must correspond positionally to each slice's rows (same samples). Nothing validates row counts or ordering before `GPAbin::GPA`; a mismatch produces a cryptic error or a silently wrong alignment.
+5. Hull guards are inconsistent. `moveplot()` handles groups with too few points for a convex hull (`plot.R:199-203`); `moveplot2()`/`moveplot3()` call `grDevices::chull` unconditionally (`plot.R:500, 788`). The package docs say hulls "require at least three observations" only for `moveplot()`.
+6. `Variable`/`time` columns must be factors with levels; none of this is validated. An integer time variable makes `nlevels()` return `NULL` and the functions fail downstream with an unhelpful error. `NAs` anywhere are unhandled and undocumented.
+7. large-scale duplication. The ggplot construction (~200 lines) is copy-pasted across `moveplot`/`moveplot2`/`moveplot3`, and `moveplot_func()` (`moveplot_func.R`) is a second, unexported, currently unused implementation of `moveplot()` with newer features (group.col, which, join.dots), shipped dead code in the CRAN tarball. 
+8. Suggests packages used at runtime without guards: `knitr::kable`, `purrr`, `scales` are used inside package functions (`plot.R:446`, `evaluation_func.R:110`, etc.) but listed only in Suggests, and there's no requireNamespace() check.
+9. No tests. Suggests: testthat is declared but the package ships no tests/ directory, unusual for a CRAN package this data-wrangling-heavy.

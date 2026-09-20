@@ -158,7 +158,7 @@ bp <- biplot(Africa_climate, scaled = TRUE) |>
 \includegraphics[width=1\linewidth]{figures/biplot_Africa_climate} \caption{PCA biplot of the  climate data colored by region.}\label{fig:biplot-Afr}
 \end{figure}
 
-From the biplot in Figure \ref{fig:biplot-Afr}, the relationships between the variables are exposed, but there is some difficulty to separate the regions without intervention. Importantly, information on the time differences are not available which means a sequential exploration is impossible. These aspects are are addressed in \CRANpkg{moveEZ}.
+From the biplot in Figure \ref{fig:biplot-Afr}, the relationships between the variables are exposed, but there is some difficulty to separate the regions without intervention. Importantly, information on the time differences are not available which means a sequential exploration is impossible. These aspects are addressed in \CRANpkg{moveEZ}.
 
 Setting \texttt{move\ =\ FALSE} produces a faceted display, shown in Figure \ref{fig:moveplot-plot}, where convex hulls summarize each region at each time point:
 
@@ -317,36 +317,21 @@ results <- bp |>
   moveplot3(time.var = "Year", group.var = "Region", hulls = TRUE, 
             move = FALSE, target = NULL) |> 
   evaluation()
-results$eval.list
+results$eval.tab
 \end{verbatim}
 
 Table \ref{tab:comp-tab} shows the measures for the first two comparisons, the target (1989) against 1950 and 1960, respectively. The higher PS and lower CC value for 1950 relative to 1960 indicates that the multivariate structure of 1950 is more dissimilar to the 1989 reference than that of 1960, which is consistent with the greater temporal distance between these years.
 
 \begin{table}
-\caption{\label{tab:comp-tab}Measures of comparison.}
 
+\caption{\label{tab:comp-tab}Measures of comparison.}
 \centering
-\begin{tabular}[t]{lr}
+\begin{tabular}[t]{lrrrrr}
 \toprule
-  & Target vs. 1950\\
+  & PS & CC & AMB & MB & RMSB\\
 \midrule
-PS & 0.1323\\
-CC & 0.9697\\
-AMB & 1.2717\\
-MB & 0.0000\\
-RMSB & 1.8506\\
-\bottomrule
-\end{tabular}
-\centering
-\begin{tabular}[t]{lr}
-\toprule
-  & Target vs. 1960\\
-\midrule
-PS & 0.0982\\
-CC & 0.9763\\
-AMB & 0.4414\\
-MB & 0.0000\\
-RMSB & 0.5779\\
+Target vs. 1950 & 0.132 & 0.970 & 1.272 & 0 & 1.851\\
+Target vs. 1960 & 0.098 & 0.976 & 0.441 & 0 & 0.578\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -385,8 +370,6 @@ Future development of \CRANpkg{moveEZ} will focus on extending animation support
 \section{Acknowledgements}\label{acknowledgements}
 
 We are grateful for the insights and contributions of Dianne Cook during the initial design phase of this package. Thank you for the financial support from the National Graduate Academy for Mathematical and Statistical Sciences (NGA(MaSS)).
-
-\section{References}\label{references}
 
 \bibliography{moveEZ.bib}
 
