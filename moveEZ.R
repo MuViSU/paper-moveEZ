@@ -78,7 +78,34 @@ if (knitr::is_latex_output()) {
 }
 
 
+## ----tour-table, echo=FALSE---------------------------------------------------
+tour_tab <- data.frame(
+  Method = c("Tour", "moveplot()", "moveplot2(), moveplot3()"),
+  Data = c("Fixed", "Changes with time level", "Changes with time level"),
+  Basis = c("Changes", "Fixed", "Changes with time level"),
+  `Meaning of movement` = c(
+    "A different view of the same data",
+    "Time slices move in one common space",
+    "Data and basis change together"
+  ),
+  check.names = FALSE
+)
 
+if (knitr::is_html_output()) {
+  knitr::kable(tour_tab,
+      caption = "A tour compared with the three moveEZ functions.",
+      booktabs = TRUE, escape = FALSE, align = "l")
+}
+if (knitr::is_latex_output()) {
+  knitr::kable(tour_tab,
+      caption = "A tour compared with the three moveEZ functions.",
+      booktabs = TRUE, escape = FALSE, align = "l", format = "latex") |>
+  kable_styling(
+    latex_options = c("hold_position", "scale_down"),
+    full_width = FALSE,
+    font_size = 9
+  )
+}
 
 
 ## ----fixed-frame, echo = FALSE, fig.width = 6, fig.height = 4, fig.cap="The fixed variable framework where the sample coordinates in matrix ${\\bf{Z}}$ are sliced according to the levels of the time variable $T$ and the variable vectors in matrix ${\\bf{V}}$ remaining fixed."----

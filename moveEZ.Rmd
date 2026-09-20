@@ -46,8 +46,27 @@ library(gapminder)
 
 # Introduction
 
+The \CRANpkg{moveEZ} R package provides tools for constructing and animating Principal Component Analysis (PCA) biplots for multivariate data observed across the levels of an ordered variable. PCA biplots, constructed using the companion package \CRANpkg{biplotEZ} [@biplotEZ], provide a joint low-dimensional representation of observations and variables. When multivariate data are observed sequentially, however, examining a separate biplot at each level makes gradual changes in observations and variables difficult to follow. \CRANpkg{moveEZ} addresses this problem by displaying transitions between successive biplots, allowing changes in multivariate structure to be viewed as a visually continuous sequence across the observed levels. Although originally motivated by the study of climate conditions over time, the package is domain-agnostic and can be applied whenever multivariate measurements are indexed by a meaningful ordering, such as time, experimental stage, algorithmic iteration, or another ordered sequence.
 
-The \CRANpkg{moveEZ} R package introduces animated Principal Component analysis (PCA) biplots for the visualization of multivariate data observed repeatedly across the ordered levels of a categorical variable. PCA biplots, constructed via the companion package \CRANpkg{biplotEZ} (@biplotEZ), are effective for revealing structure in high-dimensional data. However, when data are sequentially structured in this way, restricting visualizations to individual levels obscures the continuity of change, making gradual movement in samples or variables across the sequence difficult to detect. \CRANpkg{moveEZ} addresses this by animating transitions between levels and supporting dynamic exploration, allowing analysts to perceive movement in multivariate space as a continuous process rather than a sequence of discrete comparisons. Although originally motivated by the tracking of climate conditions over time, the package is domain-agnostic and applicable wherever multivariate measurements are recorded repeatedly across an ordered categorical variable; whether that variable represents time, experimental stages, algorithmic iterations, or any other meaningful sequence.
+Animation itself has a long history in multivariate statistical graphics. The grand tour [@Asimov1985] displays a smooth sequence of low-dimensional projections of a multivariate dataset, and the \CRANpkg{tourr} package [@tourr] provides an implementation of tour methods in R. Several packages extend this framework. \CRANpkg{spinifex} [@spinifex] provides manual tours in which the analyst controls changes in the contribution of variables to the projection, while \CRANpkg{langevitour} [@langevitour] and \CRANpkg{detourr} [@detourr] provide browser-based implementations supporting smooth and interactive projection tours. @Lee2022 provide a broader review of tour methods. These methods primarily address the exploration of a fixed multivariate dataset through a changing projection basis. The quantity indexing the animation is therefore the projection itself rather than an observed variable in the data.
+
+\CRANpkg{moveEZ} addresses a different problem: how does a multivariate configuration change across the levels of an observed ordered variable? Here the data change from one level to the next while the type of representation remains fixed. The two approaches are therefore complementary. A tour explores alternative low-dimensional projections of a dataset and may reveal structure that is not visible in the PCA plane; \CRANpkg{moveEZ}, by contrast, displays how PCA-based representations change across ordered subsets of the data. Section [Relation to tour methods](#tour-relation) discusses these conceptual differences and their implications in more detail.
+
+An additional difficulty arises because PCA biplots fitted independently at successive levels cannot necessarily be compared directly. Their orientations are arbitrary, so two geometrically equivalent configurations may differ by a rotation or reflection. Simply concatenating independently fitted biplots into an animation can therefore introduce apparent movement that reflects orientation indeterminacy rather than change in the underlying multivariate structure. \CRANpkg{moveEZ} addresses this problem by aligning independently fitted configurations before displaying their evolution.
+
+The closest earlier work is the dynamic biplot of @Egido2015, available through the graphical interface of \CRANpkg{dynBiplotGUI} [@dynBiplotGUI]. It fits an HJ-biplot to one reference occasion of a three-way dataset and projects the other occasions onto it, which gives static trajectories in one fixed biplot. It does not refit the biplot at each level, align independently fitted biplots, or animate them. The contribution of \CRANpkg{moveEZ} lies in integrating these steps within a single R workflow. In particular, \texttt{moveplot3()} combines independently fitted PCA biplots across an ordered variable with generalized Procrustes alignment to either a consensus configuration or a user-supplied target. The package also provides quantitative measures describing the agreement or deviation of each aligned configuration relative to its target and generates both animated sequences and corresponding static faceted displays through a common \CRANpkg{ggplot2}-based interface.
+
+# Animation in statistical graphics
+
+Animated bubble charts of the *gapminder* data brought temporal animation in statistical graphics to a broad audience. Motion is a perceptually noticeable display dimension and can produce strong perceptual grouping: elements with similar motion tend to be perceived as belonging together [@Bartram2002; @Ware2013]. Smooth transitions between states of a statistical graphic can also help viewers maintain correspondence between graphical elements and perceive changes more effectively than abrupt transitions [@Heer2007].
+
+The empirical evidence nevertheless shows that these benefits are conditional. @Tversky2002 reviewed studies comparing animated and static graphics and found that many reported advantages of animation disappeared when the displays carried equivalent information. They noted that animations are transient and may be too fast or too complex to perceive accurately. They proposed that effective animations should be readily apprehended (the apprehension principle) and that visible changes should correspond to changes in the underlying content (the congruence principle). @Robertson2008 compared animation, traces, and small multiples for trend data similar to *gapminder*. Animation was engaging and performed well in some presentation tasks, but also produced more errors; for analysis tasks, the static alternatives were generally faster, with small multiples providing greater accuracy. Related comparisons in other dynamic visualization settings similarly show that the relative effectiveness of animation and static alternatives depends on the task [@Archambault2011; @Brehmer2020].
+
+These findings are consistent with known limits of visual attention. Observers can accurately track only a small number of independently moving targets, typically about four or five under standard multiple-object-tracking conditions [@Pylyshyn1988], while changes occurring outside the focus of attention are frequently missed [@Rensink2002]. These limitations are relevant to animated biplots, in which many observations and several variable vectors may move simultaneously. Furthermore, frames interpolated between successive observed levels are graphical transitions and should not be interpreted as additional observed data.
+
+The design of \CRANpkg{moveEZ} responds to these limitations in several ways. First, animation and small multiples are treated as complementary: the plotting functions can produce static faceted displays of the same biplots with `move = FALSE`, allowing animation to provide an overview while facets support detailed comparison. Second, when individual observations are displayed, the `shadow` argument retains traces of earlier positions, following the same general principle as trajectory-based displays that make temporal paths simultaneously visible [@Robertson2008]. Third, for grouped data, convex hulls and directed variable vectors provide higher-level visual summaries, reducing the need to interpret the display solely by tracking individual observations. Fourth, the animation pauses at each observed level, providing additional time to apprehend each configuration, while the Procrustes alignment used by `moveplot3()` removes arbitrary differences in orientation before the configurations are animated. These choices are consistent with the apprehension and congruence principles of @Tversky2002. Finally, the `evaluation()` function provides quantitative measures of the agreement or deviation of individual configurations relative to the alignment target, supplementing visual interpretation.
+
+We have not conducted a user study specifically evaluating animated biplots. The design rationale for \CRANpkg{moveEZ} is therefore informed by the broader literature on animation, visual perception, and dynamic statistical graphics rather than by direct experimental evidence for the package itself. A formal evaluation comparing animated and static representations of evolving biplots remains an important direction for future work.
 
 
 # PCA Biplots {#pca-biplots}
@@ -130,9 +149,6 @@ if (knitr::is_latex_output()) {
   column_spec(3, width = "3.5cm") |>
   column_spec(4, width = "3.5cm")
 }
-
-
-
 ```
 
 
@@ -140,6 +156,45 @@ Table \@ref(tab:comparison-table) shows that there is a trade-off between simpli
 
 In all three functions, the core biplot construction is handled by \CRANpkg{biplotEZ} (@biplotEZ), and the resulting object is passed directly to the relevant moveplot function via the pipe operator.
 
+## Relation to tour methods {#tour-relation}
+
+In a tour, the data ${\bf{X}}$ stay fixed and frame $k$ shows ${\bf{XA}}_k$, where ${\bf{A}}_k$ is an orthonormal basis. The frames between two bases are found by geodesic interpolation [@Buja2005], so each frame is a true linear projection of the data. The axes in a tour display are the rows of ${\bf{A}}_k$, so each tour frame is a biplot of the same data. Table \@ref(tab:tour-table) compares a tour with the three functions in \CRANpkg{moveEZ}.
+
+```{r tour-table, echo=FALSE}
+tour_tab <- data.frame(
+  Method = c("Tour", "moveplot()", "moveplot2(), moveplot3()"),
+  Data = c("Fixed", "Changes with time level", "Changes with time level"),
+  Basis = c("Changes", "Fixed", "Changes with time level"),
+  `Meaning of movement` = c(
+    "A different view of the same data",
+    "Time slices move in one common space",
+    "Data and basis change together"
+  ),
+  check.names = FALSE
+)
+
+if (knitr::is_html_output()) {
+  knitr::kable(tour_tab,
+      caption = "A tour compared with the three moveEZ functions.",
+      booktabs = TRUE, escape = FALSE, align = "l")
+}
+if (knitr::is_latex_output()) {
+  knitr::kable(tour_tab,
+      caption = "A tour compared with the three moveEZ functions.",
+      booktabs = TRUE, escape = FALSE, align = "l", format = "latex") |>
+  kable_styling(
+    latex_options = c("hold_position", "scale_down"),
+    full_width = FALSE,
+    font_size = 9
+  )
+}
+```
+
+In `moveplot()`, the basis ${\bf{V}}$ is fixed and the data change: the frame for time level $t$ shows ${\bf{X}}_t{\bf{V}}$, where ${\bf{X}}_t$ is the time slice. This is the reverse of a tour. Distances are comparable between frames, and movement shows a change in the location or spread of a time slice.
+
+In `moveplot2()` and `moveplot3()`, the frame for time level $t$ shows ${\bf{X}}_t{\bf{V}}_t$. This has four implications for statistical interpretation. First, the components of different time slices are different linear combinations of the variables. The movement of a sample point thus mixes a change in the data with a change in the basis, and the variable vectors must be read together with the sample points. Second,each time slice is centred and scaled separately, so differences in mean and variance between time slices are removed. These functions show change in correlation structure. Users who want to see shifts in level must use `moveplot()`. Third, when the second and third eigenvalues of a time slice are near, the PCA plane is not stable, and a large visual change can come from sampling variation. GPA removes rotation and reflection in the plane, but it cannot remove this effect. The `evaluation()` measures help to identify such time slices. Fourth, the frames between two time levels are linear interpolations of coordinates. They are not projections of data, which is different from a tour.
+
+**JNS to comment on the scaling in GPA [R5-12].**
 
 # Fixed variable frame
 In the fixed variable frame, a single PCA solution is performed on the full dataset ${\bf{X}}$, yielding one set of sample scores, ${\bf{Z}}$, represented by plotted coordinates, and one set of variable loadings, ${\bf{V}}$, as vectors. The variable vectors remain constant throughout the animation, providing a stable reference frame for interpretation. The sample scores are then sliced according to the levels of the time variable and animated sequentially, highlighting how observations move relative to a fixed coordinate system defined by the overall variance structure of the data. This framework is illustrated in Figure \@ref(fig:fixed-frame).
@@ -565,7 +620,7 @@ The bias measures in Figure \@ref(fig:bias-line-plot) shows that the initial bia
 
 # Conclusion
 
-The \CRANpkg{moveEZ} package addresses a gap in the existing R ecosystem by extending PCA biplot methodology to longitudinal and sequentially structured multivariate data. Prior to \CRANpkg{moveEZ}, analysts working with such data were limited to constructing separate static biplots per time point which is an approach that fragments temporal information and makes gradual structural change difficult to perceive. By animating transitions between time points and providing tools to quantify the magnitude of those changes, \CRANpkg{moveEZ} enables a more continuous and interpretable view of how multivariate structure evolves over time.
+The \CRANpkg{moveEZ} package addresses a gap in the existing R ecosystem by extending PCA biplot methodology to longitudinal and sequentially structured multivariate data. Without such tools, analysts working with such data usually construct separate static biplots per time point, or static trajectories in one fixed biplot. These approaches make gradual change in both samples and variables difficult to perceive. By animating transitions between time points and providing tools to quantify the magnitude of those changes, \CRANpkg{moveEZ} enables a more continuous and interpretable view of how multivariate structure evolves over time.
 
 The three moveplot functions offer a coherent progression of methodological complexity. `moveplot()` provides an accessible entry point for datasets where the variance–covariance structure is stable across time or where only a single observation per group per time level is available. `moveplot2()` relaxes the assumption of a fixed coordinate system by computing a separate PCA solution for each time slice, at the cost of requiring manual correction of orientation discontinuities. `moveplot3()` automates this correction using GPA, making it the most robust option for datasets with many time levels or complex orientation behavior. The evaluation function complements all three by providing quantitative measures of structural similarity between time slices and a target configuration, supporting objective interpretation alongside the visual output.
 
