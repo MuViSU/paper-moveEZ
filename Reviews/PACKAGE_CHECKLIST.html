@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>package_checklist</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="PACKAGE_CHECKLIST_files/libs/clipboard/clipboard.min.js"></script>
+<script src="PACKAGE_CHECKLIST_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="PACKAGE_CHECKLIST_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="PACKAGE_CHECKLIST_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="PACKAGE_CHECKLIST_files/libs/quarto-html/popper.min.js"></script>
+<script src="PACKAGE_CHECKLIST_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="PACKAGE_CHECKLIST_files/libs/quarto-html/anchor.min.js"></script>
+<link href="PACKAGE_CHECKLIST_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="PACKAGE_CHECKLIST_files/libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="PACKAGE_CHECKLIST_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="PACKAGE_CHECKLIST_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="PACKAGE_CHECKLIST_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="moveez-what-to-check-in-the-package-before-the-case-study" class="level1">
+<h1>moveEZ: what to check in the package before the case study</h1>
+<p>Tested with moveEZ 1.3.1, biplotEZ 3.0, GPAbin 1.1.1 on 2026-09-21. “Confirmed” means I reproduced it. “To check” means I saw it in the source but did not test it. Details and numbers for most items are in <code>NOTES.md</code>.</p>
+<p>Sources: my tests, both reviews in full (<code>1-review-4.pdf</code>, <code>1-review-5.txt</code>), and the “Package Changes” sheet of the tracker (23 rows). IDs such as R5-C02 are the tracker IDs. Section G maps each of the 23 tracker rows to an item here. Items marked <strong>NEW</strong> are not in any review. I found them in the tests.</p>
+<section id="a.-problems-that-change-results-in-the-paper-fix-first" class="level2">
+<h2 class="anchored" data-anchor-id="a.-problems-that-change-results-in-the-paper-fix-first">A. Problems that change results in the paper (fix first)</h2>
+<section id="a1.-evaluation-calculates-the-bias-measures-on-the-unaligned-biplots.-confirmed.-r4-04-r5-c02-r4-07" class="level3">
+<h3 class="anchored" data-anchor-id="a1.-evaluation-calculates-the-bias-measures-on-the-unaligned-biplots.-confirmed.-r4-04-r5-c02-r4-07">A1. <code>evaluation()</code> calculates the bias measures on the unaligned biplots. Confirmed. (R4-04, R5-C02, R4-07)</h3>
+<ul>
+<li>AMB, MB and RMSB use <code>target - testee</code>, where <code>testee</code> is <code>bp$coord_set[[i]]</code> (before GPA). A PCA sign flip then looks like a large bias.</li>
+<li>Effect in the current paper: AMB for 1950 is 1.27 and 0.39 to 0.53 for the other years. On the aligned biplots 1950 is 0.23, in line with the rest, and 2000 is the largest (which agrees with PS and CC). The text on Figure “bias-line-plot” (“the initial bias is high, but decreases and stabilizes from 1960”) describes the sign flip.</li>
+<li>The function calculates <code>X.new</code> (the fitted configuration) and never uses it. PS leaves out <code>b.fact</code>.</li>
+<li>MB is always 0. Reviewer 4 says an <code>abs()</code> is missing. With <code>abs()</code> MB is the same as AMB. The real cause is the centring: the mean difference of two centred matrices is 0. Decide if MB stays, and what it must measure.</li>
+<li>R4-07: <code>Tot.SS</code>, <code>Fit.SS</code>, <code>n.X</code>, <code>p.X</code> and <code>p.Y</code> are also calculated and not used. Remove them or use them.</li>
+<li><strong>NEW:</strong> the effect on the paper (next point). The reviewers saw the code problem but not that it changes the 1950 result.</li>
+<li>Note: the reviewer says CC is also on the wrong basis. CC uses distances between points, so rotation and reflection do not change it. CC and PS are correct.</li>
+<li>Fix: calculate the bias measures on <code>bp$GPA_list[[i]]</code> or on <code>X.new</code>. Then make <code>fitplot.png</code> and <code>biasplot.png</code> again and rewrite the two paragraphs.</li>
+</ul>
+</section>
+<section id="a2.-gpabingpa-standardises-each-coordinate-column.-confirmed.-r5-07-r5-c01.-the-column-standardisation-and-the-constant-sk.f-are-new" class="level3">
+<h3 class="anchored" data-anchor-id="a2.-gpabingpa-standardises-each-coordinate-column.-confirmed.-r5-07-r5-c01.-the-column-standardisation-and-the-constant-sk.f-are-new">A2. <code>GPAbin::GPA()</code> standardises each coordinate column. Confirmed. (R5-07, R5-C01. The column standardisation and the constant <code>sk.F</code> are <strong>NEW</strong>)</h3>
+<ul>
+<li>First step is <code>sapply(Xk, scale)</code>, which divides PC1 and PC2 each by its own sd. This is not an isotropic scaling. It changes the angles between the variable axes by up to 29 degrees (Month data). In December a correlation of +0.49 is drawn with an angle of 100 degrees.</li>
+<li>The paper says the GPA transformations “preserve the distances between the coordinates”. That is not true for this step.</li>
+<li>The returned <code>sk.F</code> is always 1 (it is set once and never updated). So <code>s.list</code> in <code>moveplot3()</code> tells the user nothing.</li>
+<li>Decide: (a) change GPAbin to <code>scale(X, scale = FALSE)</code> and return the real scale factors, or (b) do the centring and the GPA call inside moveEZ with control of the scaling, or (c) keep it and document it. Option (a) or (b) is the clean answer to the reviewer.</li>
+<li>Then: expose a <code>scaling = TRUE/FALSE</code> argument in <code>moveplot3()</code> and return the scale factors.</li>
+</ul>
+</section>
+<section id="a3.-moveplot3-stacks-samples-and-axes-in-one-matrix-for-gpa.-confirmed.-new.-related-to-r4-03-and-r5-06" class="level3">
+<h3 class="anchored" data-anchor-id="a3.-moveplot3-stacks-samples-and-axes-in-one-matrix-for-gpa.-confirmed.-new.-related-to-r4-03-and-r5-06">A3. <code>moveplot3()</code> stacks samples and axes in one matrix for GPA. Confirmed. (<strong>NEW</strong>. Related to R4-03 and R5-06)</h3>
+<ul>
+<li>GPA gets 80 (or 120) sample rows and 6 axis rows, so the samples control the rotation. The axes get no weight of their own.</li>
+<li>The matrix is centred on the mean of samples plus axis end points. This mean is not zero, but the arrows are drawn from (0, 0). The error is small (1 to 2 degrees).</li>
+<li>Decide: is “align on the samples, then apply the same transformation to the axes” the intended method? If yes, fit GPA on the sample rows only and apply <code>Q</code> and <code>s</code> to the axis rows. That also removes the origin shift. State the choice in the paper.</li>
+</ul>
+</section>
+<section id="a4.-moveplot3-ignores-the-level-order-of-time.var.-confirmed-for-facets.-to-check-for-the-animation.-new" class="level3">
+<h3 class="anchored" data-anchor-id="a4.-moveplot3-ignores-the-level-order-of-time.var.-confirmed-for-facets.-to-check-for-the-animation.-new">A4. <code>moveplot3()</code> ignores the level order of <code>time.var</code>. Confirmed for facets. To check for the animation. (<strong>NEW</strong>)</h3>
+<ul>
+<li>The axis tables store the time variable as character (<code>time.var = iter_levels[i]</code>). The sample table keeps the factor. Facets come in alphabetical order (April, August, December, …). Panel content is correct.</li>
+<li><code>transition_states()</code> gets the same data, so check the order of the animation with <code>move = TRUE</code> and Month.</li>
+<li>Not visible with Year, because “1950” to “2020” sort the same way.</li>
+<li>Fix: <code>factor(iter_levels[i], levels = iter_levels)</code> for both axis tables. <code>moveplot()</code> and <code>moveplot2()</code> are correct.</li>
+</ul>
+</section>
+<section id="a5.-moveplot3-depends-on-the-row-order-and-does-not-check-it.-confirmed.-r5-c04" class="level3">
+<h3 class="anchored" data-anchor-id="a5.-moveplot3-depends-on-the-row-order-and-does-not-check-it.-confirmed.-r5-c04">A5. <code>moveplot3()</code> depends on the row order and does not check it. Confirmed. (R5-C04)</h3>
+<ul>
+<li>GPA matches row i of one slice with row i of the next. The same data in a shuffled row order gives a different alignment (axis coordinates differ by up to 0.07 in the test).</li>
+<li>A target with the wrong number of rows gives “non-conformable arguments”.</li>
+<li>Fix: check <code>nrow(target)</code> against the slice size with a clear message. Document that rows must correspond. Better: add an <code>id.var</code> argument (or sort by <code>group.var</code> plus an id) so that the match is explicit.</li>
+</ul>
+</section>
+</section>
+<section id="b.-problems-that-break-use-outside-the-year-example" class="level2">
+<h2 class="anchored" data-anchor-id="b.-problems-that-break-use-outside-the-year-example">B. Problems that break use outside the Year example</h2>
+<section id="b1.-evaluation-assumes-numeric-time-levels-and-the-name-year.-confirmed.-r5-c03" class="level3">
+<h3 class="anchored" data-anchor-id="b1.-evaluation-assumes-numeric-time-levels-and-the-name-year.-confirmed.-r5-c03">B1. <code>evaluation()</code> assumes numeric time levels and the name “Year”. Confirmed. (R5-C03)</h3>
+<ul>
+<li><code>as.numeric(gsub("Target vs. ", "", ...))</code> gives NA for months. <code>fit.plot</code> and <code>bias.plot</code> are empty, with 12 warnings. The column and the axis label are always <code>Year</code>.</li>
+<li>Fix: keep the levels as an ordered factor from <code>bp$iter_levels</code>, and use the name of <code>time.var</code>. <code>moveplot3()</code> must then store <code>time.var</code> in the object.</li>
+</ul>
+</section>
+<section id="b2.-the-object-from-moveplot2-fails-in-print.-confirmed.-new.-related-to-inconsistent-output-structures-in-r5-c00" class="level3">
+<h3 class="anchored" data-anchor-id="b2.-the-object-from-moveplot2-fails-in-print.-confirmed.-new.-related-to-inconsistent-output-structures-in-r5-c00">B2. The object from <code>moveplot2()</code> fails in <code>print()</code>. Confirmed. (<strong>NEW</strong>. Related to “inconsistent output structures” in R5-C00)</h3>
+<ul>
+<li><code>bp$quality</code> is overwritten with a <code>knitr::kable</code>. <code>print.biplot()</code> calculates <code>x$quality * 100</code> and stops with “non-numeric argument to binary operator”. This occurs when the result is not assigned, for example at the end of a pipe.</li>
+<li>Fix: store the tables under new names (<code>bp$quality.time</code>, <code>bp$axis.predictivity.time</code>), or return data frames and let the user call <code>kable()</code>. Data frames are also easier to use in a paper than a ready kable. Same point for <code>evaluation()$eval.tab</code>: the paper now takes the numbers from the plot data because <code>eval.tab</code> is a kable.</li>
+</ul>
+</section>
+<section id="b3.-evaluation-on-a-wrong-object-prints-a-message-and-continues.-confirmed.-r4-06" class="level3">
+<h3 class="anchored" data-anchor-id="b3.-evaluation-on-a-wrong-object-prints-a-message-and-continues.-confirmed.-r4-06">B3. <code>evaluation()</code> on a wrong object prints a message and continues. Confirmed. (R4-06)</h3>
+<ul>
+<li>It prints “Evaluation measures can only be applied for moveplot3().” and returns the object. Use <code>stop()</code>.</li>
+</ul>
+</section>
+<section id="b4.-group.var-null.-confirmed.-new" class="level3">
+<h3 class="anchored" data-anchor-id="b4.-group.var-null.-confirmed.-new">B4. <code>group.var = NULL</code>. Confirmed. (<strong>NEW</strong>)</h3>
+<ul>
+<li>The three functions have code for <code>is.null(group.var)</code>, but <code>check_vars_moveEZ()</code> rejects NULL. Either permit NULL or remove the dead branches. Check what the help pages say.</li>
+</ul>
+</section>
+<section id="b5.-checks-that-moveplot2-has-and-moveplot3-does-not.-to-check.-r5-c05" class="level3">
+<h3 class="anchored" data-anchor-id="b5.-checks-that-moveplot2-has-and-moveplot3-does-not.-to-check.-r5-c05">B5. Checks that <code>moveplot2()</code> has and <code>moveplot3()</code> does not. To check. (R5-C05)</h3>
+<ul>
+<li><code>moveplot2()</code> stops when a slice has fewer than 4 rows. <code>moveplot3()</code> has no such check.</li>
+<li>Hull guards (R5 code 5): in 1.3.1 both call <code>chull_moveEZ()</code>, which seems to handle small groups. Confirm that the help pages of <code>moveplot2()</code> and <code>moveplot3()</code> say so.</li>
+<li><code>moveplot3()</code> handles only PCA. <code>moveplot2()</code> also handles CVA. Check what <code>moveplot3()</code> does with a CVA object (clear error or wrong result).</li>
+</ul>
+</section>
+<section id="b6.-title-size.-confirmed.-new" class="level3">
+<h3 class="anchored" data-anchor-id="b6.-title-size.-confirmed.-new">B6. Title size. Confirmed. (<strong>NEW</strong>)</h3>
+<ul>
+<li><code>moveplot()</code> sets <code>plot.title</code> to size 30. This is good for the animation. If a user adds a title to the facet plot, it is very large. Low priority.</li>
+</ul>
+</section>
+</section>
+<section id="c.-package-data-new" class="level2">
+<h2 class="anchored" data-anchor-id="c.-package-data-new">C. Package data (<strong>NEW</strong>)</h2>
+<ul>
+<li><code>Africa_climate$Month</code> has alphabetical levels. Give it calendar-order levels (<code>levels = month.name</code>). Without this, every Month example needs a relevel first.</li>
+<li>Row order in <code>Africa_climate</code> is already the same in each Month slice and each Year slice. Keep it like that and say so in the help page (see A5).</li>
+<li>NEAF 1950 (mean SPI6 2.12, mean AP 3.31) is far from all later years. Check it against the ERA5 source before any text interprets it.</li>
+</ul>
+</section>
+<section id="d.-code-quality-and-documentation-from-the-reviews" class="level2">
+<h2 class="anchored" data-anchor-id="d.-code-quality-and-documentation-from-the-reviews">D. Code quality and documentation (from the reviews)</h2>
+<ul>
+<li>R5-C06: validation of <code>time.var</code> and <code>group.var</code>. Mostly done in 1.3.1 (<code>check_vars_moveEZ()</code> checks factor and NA with clear messages). Confirm that the help pages match, and document the NA handling.</li>
+<li>R5-C07, R4-07: the ggplot code is copied in the three functions, and <code>moveplot_func()</code> is unused code in the tarball. A shared internal plot function will also stop bugs like A4, where one copy differs from the others.</li>
+<li>R5-C08: <code>knitr</code>, <code>purrr</code> and <code>scales</code> are used at run time but are in Suggests. Move them to Imports or add <code>requireNamespace()</code> checks.</li>
+<li>R5-C09: no tests. See E.</li>
+<li>R5-C00: full check of the help pages, examples and vignette. The reviewer reports copy-paste errors, and examples and parameter descriptions that do not match the code. Read each help page against the function arguments.</li>
+<li>R4-09 (Maybe): the wording “squared sum of squares distances”. Check if the <code>moveplot3()</code> help page has the same phrase as the paper.</li>
+<li>R5-02, R5-10 (Maybe): put the guidance in the help pages and the vignette, not only in the paper. When to use the fixed frame and when the dynamic frame, and how to read movement in each. The text in <code>case_study_draft.Rmd</code> (“Which axes to interpret”, the guide at the end of Part A) can be the start.</li>
+</ul>
+</section>
+<section id="d2.-feature-and-api-requests-from-the-reviews.-a-decision-is-necessary-for-each." class="level2">
+<h2 class="anchored" data-anchor-id="d2.-feature-and-api-requests-from-the-reviews.-a-decision-is-necessary-for-each.">D2. Feature and API requests (from the reviews). A decision is necessary for each.</h2>
+<ul>
+<li>R4-05, R5-19: function names that tell what each function does. Aliases can keep the old names, so current code does not break. Both reviewers ask for this.</li>
+<li>R5-24: plot <code>1 - CC</code> in <code>fit.plot</code>, so that PS and CC read in the same direction and the small CC range is visible. Do this together with A1 and B1, because all three change <code>evaluation()</code>.</li>
+<li>R5-22: an option for 90% or 95% ellipses next to the convex hulls. Hulls are sensitive to outliers. “Will not change” with a reason in the response is also possible.</li>
+<li>R5-03 (Maybe): an option to select other components than PC1 and PC2. The axis predictivity table shows why this can matter: SPI6 and, in winter, Temp are mostly on PC3. If the package does not get the option, the paper must justify the limit.</li>
+<li>R4-03 (Maybe): an option for a single-step alignment of each slice to one target slice, without the GPA iteration. Reviewer 4 says GPA is not necessary if the subspace is not important. This links to A3: decide what is aligned (samples, axes or the two together) and to what.</li>
+</ul>
+</section>
+<section id="e.-tests-to-add-each-one-comes-from-a-bug-above" class="level2">
+<h2 class="anchored" data-anchor-id="e.-tests-to-add-each-one-comes-from-a-bug-above">E. Tests to add (each one comes from a bug above)</h2>
+<ol type="1">
+<li>Facet and animation order follow the factor levels for a non-alphabetical time variable (A4).</li>
+<li><code>evaluation()</code> bias measures do not change when one slice is reflected (A1).</li>
+<li>The angle between two axes is the same before and after alignment, if scaling is off (A2).</li>
+<li>Shuffled rows give an error or the same result (A5).</li>
+<li>A target with the wrong number of rows gives a clear error (A5).</li>
+<li><code>evaluation()</code> works with month names as time levels (B1).</li>
+<li><code>print()</code> works on the result of each function (B2).</li>
+</ol>
+</section>
+<section id="f.-after-the-fixes-what-to-do-again-in-the-paper" class="level2">
+<h2 class="anchored" data-anchor-id="f.-after-the-fixes-what-to-do-again-in-the-paper">F. After the fixes: what to do again in the paper</h2>
+<ol type="1">
+<li>Make all <code>moveplot3()</code> figures again (<code>biplot_targetNULL.png</code>, the 1989 target figure). With A2 and A3 fixed, the axis directions will change.</li>
+<li>Make <code>fitplot.png</code>, <code>biasplot.png</code> and the comparison table again. Rewrite the interpretation (A1).</li>
+<li>Correct the sentence on admissible transformations in the GPA section, and state what scaling is used (A2).</li>
+<li>Run <code>New case study/case_study_simple.R</code> again and remove its temporary lines for the facet order (A4). Then check the numbers in <code>case_study_draft.Rmd</code>. The correlations and the axis predictivities will not change. The rotation angles (112 and 123 degrees) will.</li>
+<li>Update the responses for R5-07, R5-C01 and the code comments.</li>
+</ol>
+</section>
+<section id="g.-coverage-the-23-rows-of-the-tracker-sheet-package-changes" class="level2">
+<h2 class="anchored" data-anchor-id="g.-coverage-the-23-rows-of-the-tracker-sheet-package-changes">G. Coverage: the 23 rows of the tracker sheet “Package Changes”</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tracker ID</th>
+<th>Item here</th>
+<th>State after my tests</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R4-04</td>
+<td>A1</td>
+<td>Confirmed. Also changes the 1950 result in the paper.</td>
+</tr>
+<tr class="even">
+<td>R5-C02</td>
+<td>A1</td>
+<td>Confirmed. CC is correct (it uses distances). PS leaves out <code>b.fact</code>.</td>
+</tr>
+<tr class="odd">
+<td>R4-07</td>
+<td>A1, D</td>
+<td>Confirmed in the source.</td>
+</tr>
+<tr class="even">
+<td>R5-07</td>
+<td>A2</td>
+<td>Confirmed: scaling is on.</td>
+</tr>
+<tr class="odd">
+<td>R5-C01</td>
+<td>A2</td>
+<td>Confirmed. Also: column standardisation, and <code>sk.F</code> is always 1.</td>
+</tr>
+<tr class="even">
+<td>R5-C04</td>
+<td>A5</td>
+<td>Confirmed: unclear error for a wrong row count, and a silent change for a different row order.</td>
+</tr>
+<tr class="odd">
+<td>R5-C03</td>
+<td>B1</td>
+<td>Confirmed with Month.</td>
+</tr>
+<tr class="even">
+<td>R4-06</td>
+<td>B3</td>
+<td>Confirmed.</td>
+</tr>
+<tr class="odd">
+<td>R5-C05</td>
+<td>B5</td>
+<td>To check. 1.3.1 seems to guard small groups in all three functions.</td>
+</tr>
+<tr class="even">
+<td>R5-C06</td>
+<td>D</td>
+<td>Mostly done in 1.3.1. Check the documentation.</td>
+</tr>
+<tr class="odd">
+<td>R5-C07</td>
+<td>D</td>
+<td>Not tested (package source is not in this repository).</td>
+</tr>
+<tr class="even">
+<td>R5-C08</td>
+<td>D</td>
+<td>Not tested.</td>
+</tr>
+<tr class="odd">
+<td>R5-C09</td>
+<td>E</td>
+<td>Seven tests proposed.</td>
+</tr>
+<tr class="even">
+<td>R5-C00</td>
+<td>D</td>
+<td>Not tested. B2 and B4 are examples of the inconsistencies.</td>
+</tr>
+<tr class="odd">
+<td>R4-09</td>
+<td>D</td>
+<td>To check in the help page.</td>
+</tr>
+<tr class="even">
+<td>R5-02</td>
+<td>D</td>
+<td>Draft text exists in <code>case_study_draft.Rmd</code>.</td>
+</tr>
+<tr class="odd">
+<td>R5-10</td>
+<td>D</td>
+<td>Draft text exists in <code>case_study_draft.Rmd</code>.</td>
+</tr>
+<tr class="even">
+<td>R4-05</td>
+<td>D2</td>
+<td>Decision.</td>
+</tr>
+<tr class="odd">
+<td>R5-19</td>
+<td>D2</td>
+<td>Decision.</td>
+</tr>
+<tr class="even">
+<td>R5-24</td>
+<td>D2</td>
+<td>Decision. Small change.</td>
+</tr>
+<tr class="odd">
+<td>R5-22</td>
+<td>D2</td>
+<td>Decision.</td>
+</tr>
+<tr class="even">
+<td>R5-03</td>
+<td>D2</td>
+<td>Decision.</td>
+</tr>
+<tr class="odd">
+<td>R4-03</td>
+<td>D2, A3</td>
+<td>Decision.</td>
+</tr>
+</tbody>
+</table>
+<p>Not in the tracker, found in the tests (add them to the tracker if you agree): A3, A4, B2, B4, B6, C, the column standardisation and constant <code>sk.F</code> in A2, and the effect of A1 on the 1950 result.</p>
+<p>Reviewer comments that need no package change are not in this list (for example R4-02, the formal description of GPA, and the comments on related work). They are in the tracker sheet “All Comments”.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
