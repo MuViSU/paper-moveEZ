@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.9.20)  20 SEP 2026 22:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.9.20)  20 SEP 2026 22:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -834,27 +834,25 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 204.
 
-<figures/biplot_Africa_climate.png, id=278, 724.7075pt x 736.7525pt>
+<figures/biplot_Africa_climate.png, id=277, 724.7075pt x 736.7525pt>
 File: figures/biplot_Africa_climate.png Graphic file (type png)
 <use figures/biplot_Africa_climate.png>
 Package pdftex.def Info: figures/biplot_Africa_climate.png  used on input line 205.
 (pdftex.def)             Requested size: 398.33858pt x 404.9678pt.
-[8 <./figures/biplot_Africa_climate.png>]
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 217.
 
-<figures/facet_Africa_climate.png, id=287, 855.195pt x 951.555pt>
+<figures/facet_Africa_climate.png, id=281, 855.195pt x 951.555pt>
 File: figures/facet_Africa_climate.png Graphic file (type png)
 <use figures/facet_Africa_climate.png>
 Package pdftex.def Info: figures/facet_Africa_climate.png  used on input line 218.
 (pdftex.def)             Requested size: 398.33858pt x 443.22351pt.
-[9 <./figures/facet_Africa_climate.png>]
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 234.
 
-<figures/Dynamic_frame.png, id=295, 477.785pt x 480.79625pt>
+<figures/Dynamic_frame.png, id=283, 477.785pt x 480.79625pt>
 File: figures/Dynamic_frame.png Graphic file (type png)
 <use figures/Dynamic_frame.png>
 Package pdftex.def Info: figures/Dynamic_frame.png  used on input line 235.
@@ -863,27 +861,27 @@ Package pdftex.def Info: figures/Dynamic_frame.png  used on input line 235.
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 245.
 
-<figures/facet2_Africa_climate.png, id=296, 873.2625pt x 980.66376pt>
+<figures/facet2_Africa_climate.png, id=284, 873.2625pt x 980.66376pt>
 File: figures/facet2_Africa_climate.png Graphic file (type png)
 <use figures/facet2_Africa_climate.png>
 Package pdftex.def Info: figures/facet2_Africa_climate.png  used on input line 246.
 (pdftex.def)             Requested size: 398.33858pt x 447.32498pt.
-[10 <./figures/Dynamic_frame.png>] [11 <./figures/facet2_Africa_climate.png>] [12]
+[8] [9 <./figures/biplot_Africa_climate.png>] [10 <./figures/facet_Africa_climate.png>] [11 <./figures/Dynamic_frame.png>] [12 <./figures/facet2_Africa_climate.png>] [13]
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 320.
 
-<figures/biplot_targetNULL.png, id=324, 1001.7425pt x 1025.8325pt>
+<figures/biplot_targetNULL.png, id=329, 1001.7425pt x 1025.8325pt>
 File: figures/biplot_targetNULL.png Graphic file (type png)
 <use figures/biplot_targetNULL.png>
 Package pdftex.def Info: figures/biplot_targetNULL.png  used on input line 321.
 (pdftex.def)             Requested size: 398.33858pt x 407.91519pt.
-[13 <./figures/biplot_targetNULL.png>]
+[14 <./figures/biplot_targetNULL.png>] [15]
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 395.
 
-<figures/fitplot.png, id=338, 1037.8775pt x 958.58125pt>
+<figures/fitplot.png, id=348, 1037.8775pt x 958.58125pt>
 File: figures/fitplot.png Graphic file (type png)
 <use figures/fitplot.png>
 Package pdftex.def Info: figures/fitplot.png  used on input line 396.
@@ -892,33 +890,34 @@ Package pdftex.def Info: figures/fitplot.png  used on input line 396.
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `!tbp') on input line 399.
 
-<figures/biasplot.png, id=339, 1054.94125pt x 952.55875pt>
+<figures/biasplot.png, id=349, 1054.94125pt x 952.55875pt>
 File: figures/biasplot.png Graphic file (type png)
 <use figures/biasplot.png>
 Package pdftex.def Info: figures/biasplot.png  used on input line 400.
 (pdftex.def)             Requested size: 398.33858pt x 359.67958pt.
-[14] [15 <./figures/fitplot.png>] [16 <./figures/biasplot.png>]
+
 Overfull \hbox (5.13383pt too wide) in paragraph at lines 411--412
 []\T1/ppl/m/n/9 (-20) The three move-plot func-tions of-fer a co-her-ent pro-gres-sion of method-olog-i-cal com-plex-ity. \T1/zi4/m/n/9 moveplot()
  []
 
-(./RJwrapper.bbl (./RJwrapper.brf)
+[16 <./figures/fitplot.png>] [17 <./figures/biasplot.png>] (./RJwrapper.bbl (./RJwrapper.brf)
 \tf@brf=\write6
 \openout6 = `RJwrapper.brf'.
 
-[17]
+[18]
 Underfull \hbox (badness 1237) in paragraph at lines 138--138
 \T1/ppl/m/it/9 (+20) play\T1/ppl/m/n/9 (+20) , 2025.  URL [][]$\T1/zi4/m/n/9 https : / / github . com / jnienk / GPAbin$[][]\T1/ppl/m/n/9 (+20) .  R pack-age ver-sion 1.1.1, com-mit
  []
 
-[18])
+)
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 431.
 
+[19]
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
 (Font)              scaled to size 9.18004pt on input line 441.
-) [19] (./RJwrapper.aux)
+) [20] (./RJwrapper.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-08-10>
@@ -929,21 +928,21 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
 (rerunfilecheck)             Checksum: 7B2C0E55E33FDACD8811D00BEF37F8C1;3860.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
-(rerunfilecheck)             Checksum: C77F983CC41BD9C90AC34FE9140F9C36;1620.
+(rerunfilecheck)             Checksum: B569F82DEB1E5572095C9C1681C58272;1620.
  ) 
 Here is how much of TeX's memory you used:
- 27657 strings out of 469089
- 508430 string characters out of 5457832
- 935924 words of memory out of 5000000
+ 27658 strings out of 469089
+ 508437 string characters out of 5457832
+ 935925 words of memory out of 5000000
  55851 multiletter control sequences out of 15000+600000
  672136 words of font info for 293 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 117i,12n,131p,1419b,954s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,11n,131p,1419b,985s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplbi8a.pfb></Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></Users/raeesaganey/Library/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (19 pages, 2466099 bytes).
+Output written on RJwrapper.pdf (20 pages, 2466536 bytes).
 PDF statistics:
- 489 PDF objects out of 1000 (max. 8388607)
- 429 compressed objects within 5 object streams
- 89 named destinations out of 1000 (max. 500000)
+ 493 PDF objects out of 1000 (max. 8388607)
+ 432 compressed objects within 5 object streams
+ 90 named destinations out of 1000 (max. 500000)
  59111 words of extra memory for PDF output out of 61914 (max. 10000000)
 
